@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class UserNotFoundWithRole extends RuntimeException {
+public class UserNotFoundWithRoleException extends RuntimeException {
 	
 	/**
 	 * 

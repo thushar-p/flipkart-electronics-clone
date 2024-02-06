@@ -3,6 +3,8 @@ package com.flipkart.es.entity;
 import com.flipkart.es.enums.UserRole;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
@@ -23,6 +25,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class User {
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
     private int userId;
     private String username;
     private String userEmail;

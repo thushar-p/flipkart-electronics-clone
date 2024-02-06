@@ -6,4 +6,6 @@ import com.flipkart.es.entity.User;
 
 public interface UserRepository extends JpaRepository<User, Integer>{
 
+	boolean existsByUserEmail(String userEmail);
+
 }
