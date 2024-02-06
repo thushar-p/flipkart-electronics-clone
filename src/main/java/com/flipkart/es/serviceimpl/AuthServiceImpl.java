@@ -19,7 +19,7 @@ import com.flipkart.es.requestdto.UserRequest;
 import com.flipkart.es.responsedto.UserResponse;
 import com.flipkart.es.service.AuthService;
 import com.flipkart.es.util.ResponseStructure;
-import com.flipkart.es.util.ResponseStructureProxy;
+import com.flipkart.es.util.ResponseEntityProxy;
 
 import lombok.AllArgsConstructor;
 
@@ -31,7 +31,7 @@ public class AuthServiceImpl implements AuthService{
 	private SellerRepository sellerRepository;
 	private CustomerRepository customerRepository;
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked" })
 	private <T extends User> T mapToUser(UserRequest userRequest) {
 
 		User user = null;
@@ -74,7 +74,6 @@ public class AuthServiceImpl implements AuthService{
 				throw new UserAlreadyRegisteredException("user already registered");
 
 			User user = mapToUser(userRequest);
-			
 			if(user.getUserRole().equals(UserRole.SELLER)) {
 				Seller seller = (Seller) user;
 				sellerRepository.save(seller);
@@ -83,7 +82,7 @@ public class AuthServiceImpl implements AuthService{
 				Customer customer = (Customer) user;
 				customerRepository.save(customer);
 			}
-			return ResponseStructureProxy.setResponseStructure(HttpStatus.ACCEPTED,
+			return ResponseEntityProxy.setResponseStructure(HttpStatus.ACCEPTED,
 					"user successfully saved",
 					mapToUserResponse(user));
 		}
