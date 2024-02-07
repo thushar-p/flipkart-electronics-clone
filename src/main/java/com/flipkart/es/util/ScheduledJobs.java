@@ -1,10 +1,12 @@
 package com.flipkart.es.util;
 
+import java.util.List;
+
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import com.flipkart.es.entity.User;
 import com.flipkart.es.repository.UserRepository;
-import com.flipkart.es.serviceimpl.AuthServiceImpl;
 
 import lombok.AllArgsConstructor;
 
@@ -13,15 +15,12 @@ import lombok.AllArgsConstructor;
 public class ScheduledJobs {
 
     private UserRepository userRepository;
-    private AuthServiceImpl authServiceImpl;
 
-    @Scheduled(fixedDelay = 10000L)
-    public void softDeleteNonVerifiedUser() {
-        userRepository.findByIsEmailVerified(false)
-                .forEach(user -> {
-                    user.setDeleted(true);
-                    authServiceImpl.saveUser(user);
-                });
+    @SuppressWarnings("null")
+    @Scheduled(cron = "0 0 0 * * MON-SUN")
+    public void deleteNonVerifiedUser() {
+        List<User> listOfNonVerifiedUsers = userRepository.findByIsEmailVerified(false);
+        userRepository.deleteAll(listOfNonVerifiedUsers);
     }
 
 }
