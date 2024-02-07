@@ -3,6 +3,8 @@ package com.flipkart.es.entity;
 import com.flipkart.es.enums.UserRole;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -14,7 +16,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
+@ToString
 @Entity
 @Getter
 @Setter
@@ -30,6 +34,7 @@ public class User {
     private String username;
     private String userEmail;
     private String userPassword;
+    @Enumerated(EnumType.STRING)
     private UserRole userRole;
     private boolean isEmailVerified;
     private boolean isDeleted;

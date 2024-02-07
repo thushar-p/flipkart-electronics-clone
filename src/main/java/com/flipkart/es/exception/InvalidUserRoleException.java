@@ -5,12 +5,10 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class UserNotFoundWithRoleException extends RuntimeException {
-	
-	/**
+public class InvalidUserRoleException extends RuntimeException{
+    /**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 	private String message;
-
 }
