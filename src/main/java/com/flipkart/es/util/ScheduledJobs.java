@@ -16,8 +16,7 @@ public class ScheduledJobs {
 
     private UserRepository userRepository;
 
-    @SuppressWarnings("null")
-    @Scheduled(cron = "0 0 0 * * MON-SUN")
+    @Scheduled(cron = "0 0 0 * * *")
     public void deleteNonVerifiedUser() {
         List<User> listOfNonVerifiedUsers = userRepository.findByIsEmailVerified(false);
         userRepository.deleteAll(listOfNonVerifiedUsers);

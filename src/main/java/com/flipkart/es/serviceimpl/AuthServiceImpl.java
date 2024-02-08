@@ -111,15 +111,18 @@ public class AuthServiceImpl implements AuthService {
 		.subject("complete your registration to flipkart electronics")
 		.sentDate(new Date())
 		.text(
-				"Hey " + user.getUsername()
-				+ " Welcome to flipkart electronics, <br>"
-				+ "Complete your registration using the OTP <br>"
-				+ "<h1><strong> "+otp+" </strong></h1> <br>"
-						+ "<br><br>"
-						+ "Do not share this OTP with anyone"
-						+ "<br><br>"
-						+ "with best regards"
-						+ "FlipKart electronics"
+			"<p>Hello "+ user.getUsername() + "</p><br>"
+			+"<h1><strong style='color: rgb(50, 93, 249);''>Verification mail</strong></h1>"
+			+"<p>Welcome to flipkart electronics</p>"
+			+"<p>Complete your registration using the OTP</p>"
+			+"<br>"
+			+"<h1><strong style='color: rgb(50, 93, 249);''> "+ otp +"</strong></h1>"
+			+"<br>"
+			+"<p>Do not share this otp with anyone</p>"
+			+"<p>If you didn't request for this otp, you can igonre this mail</p>"
+			+"<br>"
+			+"<p>with best regards</p>"
+			+"<p>flipkart electronics team</p>"
 						)
 		.build());
 	}
@@ -130,15 +133,16 @@ public class AuthServiceImpl implements AuthService {
 		.subject("Welcome to flipkart electronics")
 		.sentDate(new Date())
 		.text(
-			"Hello " + user.getUsername()
-			+ " we welcome you to flipkart electronics <br>"
-			+ " we at flipkart do not call our customers for the password or band related issues <br><br>"
-			+ " Beware of fraudsters"
-			+ " Have a nice shopping"
-			+ " with best regards"
-			+ " Flipkart electronics"
-		).build());
-		
+			"<h1><strong style='color: rgb(50, 93, 249);'> Welcome onboard " + user.getUsername() + " </strong></h1>"
+			+"<h2> Shop with us for you and for your loved ones</h2>"
+			+"<br>"
+			+"<p>Notice: We do not call for verification or bank/payment related issues</p>"
+			+"<p>Please be aware of the fraudsters</p>"
+			+"<br>"
+			+"<h2>Happy shopping</h2>"
+			+"<p>with best regards</p>"
+			+"<p>flipkart electronics team</p>"
+		).build());	
 		
 	}
 
