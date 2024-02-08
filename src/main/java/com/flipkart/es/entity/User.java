@@ -28,12 +28,14 @@ import lombok.ToString;
 @AllArgsConstructor
 @NoArgsConstructor
 public class User {
+	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
     private int userId;
     private String username;
     private String userEmail;
     private String userPassword;
+    
     @Enumerated(EnumType.STRING)
     private UserRole userRole;
     private boolean isEmailVerified;
