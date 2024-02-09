@@ -14,7 +14,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class CustomUserDetail implements UserDetails{
 
-    private User user;
+	private User user;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

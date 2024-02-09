@@ -4,6 +4,7 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -43,6 +44,11 @@ public class AuthApplicationHandler {
     @ExceptionHandler(InvalidOTPException.class)
     public ResponseEntity<Object> handleInvalidOTPException(InvalidOTPException exception){
         return structure(HttpStatus.BAD_REQUEST, exception.getMessage(), "registration session expired");
+    }
+
+    @ExceptionHandler(UsernameNotFoundException.class)
+    public ResponseEntity<Object> handleUsernameNotFoundException(UsernameNotFoundException exception){
+        return structure(HttpStatus.NOT_FOUND, exception.getMessage(), "user name not found");
     }
     
 }
