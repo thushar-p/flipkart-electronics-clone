@@ -20,7 +20,7 @@ public class CookieManager {
         return cookie;
     }
 
-    public Cookie invaliateCookie(Cookie cookie){
+    public Cookie invalidateCookie(Cookie cookie){
         cookie.setPath("/");
         cookie.setMaxAge(0);
         return cookie;
