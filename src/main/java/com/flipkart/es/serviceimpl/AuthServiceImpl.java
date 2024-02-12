@@ -29,6 +29,7 @@ import com.flipkart.es.exception.InvalidOTPException;
 import com.flipkart.es.exception.InvalidUserRoleException;
 import com.flipkart.es.exception.OTPExpiredException;
 import com.flipkart.es.exception.RegistrationSessionExpiredException;
+import com.flipkart.es.exception.UserNotLoggedInException;
 import com.flipkart.es.exception.UserRegisteredException;
 import com.flipkart.es.repository.AccessTokenRepository;
 import com.flipkart.es.repository.CustomerRepository;
@@ -236,12 +237,14 @@ public class AuthServiceImpl implements AuthService {
 				.accessToken(accessToken)
 				.accessTokenIsBlocked(false)
 				.accessTokenExpirationTime(LocalDateTime.now().plusSeconds(accessTokenExpiryInSeconds))
+				.user(user)
 				.build());
 
 		refreshTokenRepository.save(RefreshToken.builder()
 				.refreshToken(refreshToken)
 				.refreshTokenIsBlocked(false)
 				.refreshTokenExpirationTime(LocalDateTime.now().plusSeconds(refreshTokenExpiryInSeconds))
+				.user(user)
 				.build());
 
 	}
@@ -327,6 +330,31 @@ public class AuthServiceImpl implements AuthService {
 							mapToAuthResponse(user));
 				})
 				.orElseThrow(() -> new UsernameNotFoundException("user name not found"));
+
+	}
+
+	@Override
+	public ResponseEntity<ResponseStructure<String>> logout(String accessToken, String refreshToken, HttpServletResponse response) {
+		
+		if(accessToken == null && refreshToken == null) throw new UserNotLoggedInException("user not logged in");
+
+		accessTokenRepository.findByAccessToken(accessToken)
+		.ifPresent(accessTokenObj -> {
+			accessTokenObj.setAccessTokenIsBlocked(true);
+			accessTokenRepository.save(accessTokenObj);
+		});
+		
+		refreshTokenRepository.findByRefreshToken(refreshToken)
+		.ifPresent(refreshTokenObj -> {
+			refreshTokenObj.setRefreshTokenIsBlocked(true);
+			refreshTokenRepository.save(refreshTokenObj);
+		});
+		
+		response.addCookie(cookieManager.invalidateCookie(new Cookie("at", "")));
+		response.addCookie(cookieManager.invalidateCookie(new Cookie("rt", "")));
+		
+		return ResponseEntityProxy.setResponseStructure(HttpStatus.OK, "successfully logged out", "successfully logged out");
+
 
 	}
 

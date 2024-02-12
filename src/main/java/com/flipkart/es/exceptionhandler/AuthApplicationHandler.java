@@ -12,6 +12,7 @@ import com.flipkart.es.exception.InvalidOTPException;
 import com.flipkart.es.exception.InvalidUserRoleException;
 import com.flipkart.es.exception.OTPExpiredException;
 import com.flipkart.es.exception.RegistrationSessionExpiredException;
+import com.flipkart.es.exception.UserNotLoggedInException;
 import com.flipkart.es.exception.UserRegisteredException;
 
 @RestControllerAdvice
@@ -49,6 +50,11 @@ public class AuthApplicationHandler {
     @ExceptionHandler(UsernameNotFoundException.class)
     public ResponseEntity<Object> handleUsernameNotFoundException(UsernameNotFoundException exception){
         return structure(HttpStatus.NOT_FOUND, exception.getMessage(), "user name not found");
+    }
+    
+    @ExceptionHandler(UserNotLoggedInException.class)
+    public ResponseEntity<Object> handleUserNotLoggedInException(UserNotLoggedInException exception){
+        return structure(HttpStatus.BAD_REQUEST, exception.getMessage(), "user not logged in");
     }
     
 }
