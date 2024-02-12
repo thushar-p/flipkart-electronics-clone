@@ -223,7 +223,7 @@ public class AuthServiceImpl implements AuthService {
 	}
 
 	private void grantAccess(HttpServletResponse response, User user) {
-		// generating access and response token
+		// generating access and refresh token
 		String accessToken = jwtService.generateAccessToken(user.getUsername());
 		String refreshToken = jwtService.generateRefreshToken(user.getUsername());
 
@@ -308,14 +308,16 @@ public class AuthServiceImpl implements AuthService {
 	public ResponseEntity<ResponseStructure<AuthResponse>> login(AuthRequest authRequest,
 			HttpServletResponse httpServletResponse) {
 		String username = authRequest.getUserEmail().split("@")[0];
+
 		UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(username,
 				authRequest.getUserPassword());
+
 		Authentication authenticate = authenticationManager.authenticate(token);
 
 		if (!authenticate.isAuthenticated())
 			throw new UsernameNotFoundException("failed to authenticate the user");
 
-		// generate the cookies and authresponse and returning the client
+		// generate the cookies and authresponse and return it to client
 		return userRepository.findByUsername(username)
 				.map(user -> {
 					grantAccess(httpServletResponse, user);
