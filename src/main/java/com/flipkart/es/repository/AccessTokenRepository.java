@@ -7,6 +7,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.flipkart.es.entity.AccessToken;
+import com.flipkart.es.entity.User;
 
 public interface AccessTokenRepository extends JpaRepository<AccessToken, Long>{
 
@@ -15,5 +16,9 @@ public interface AccessTokenRepository extends JpaRepository<AccessToken, Long>{
 	List<AccessToken> findByAccessTokenExpirationTimeBefore(LocalDateTime now);
 
 	Optional<AccessToken> findByAccessTokenAndAccessTokenIsBlocked(String at, boolean b);
+
+	List<AccessToken> findByUserAndAccessTokenIsBlocked(User user, boolean isBlocked);
+
+	List<AccessToken> findByUserAndAccessTokenIsBlockedAndAccessTokenNot(User user, boolean isBlocked, String accessToken);
     
 }

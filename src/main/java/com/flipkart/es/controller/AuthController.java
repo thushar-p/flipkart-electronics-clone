@@ -50,4 +50,17 @@ public class AuthController {
 		return authService.logout(accessToken, refreshToken, response);
 	}
 	
+	@PreAuthorize("hasAuthority('CUSTOMER') OR hasAuthority('SELLER')")
+	@PutMapping("/revoke-all")
+	public ResponseEntity<ResponseStructure<String>> revokeAll(HttpServletResponse response){
+		return authService.revokeAll(response);
+	}
+	
+	@PreAuthorize("hasAuthority('CUSTOMER') OR hasAuthority('SELLER')")
+	@PutMapping("/revoke-others")
+	public ResponseEntity<ResponseStructure<String>> revokeOthers(@CookieValue(name = "at", required = false) String accessToken,
+			@CookieValue(name = "rt", required = false) String refreshToken){
+		return authService.revokeOthers(accessToken, refreshToken);
+	}
+	
 }

@@ -3,6 +3,7 @@ package com.flipkart.es.serviceimpl;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -14,6 +15,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -166,6 +168,23 @@ public class AuthServiceImpl implements AuthService {
 	}
 
 
+	
+	private void blockRefreshToken(List<RefreshToken> refreshTokens) {
+		refreshTokens.forEach(refreshToken -> {
+			refreshToken.setRefreshTokenIsBlocked(true);
+			refreshTokenRepository.save(refreshToken);
+		});
+	}
+
+	private void blockAccessToken(List<AccessToken> accessTokens) {
+		accessTokens.forEach(accessToken -> {
+			accessToken.setAccessTokenIsBlocked(true);
+			accessTokenRepository.save(accessToken);
+		});
+	}
+	
+	
+	
 
 	private String generateOTP() {
 		return String.valueOf(new Random().nextInt(111111, 999999));
@@ -358,6 +377,42 @@ public class AuthServiceImpl implements AuthService {
 		return ResponseEntityProxy.setResponseStructure(HttpStatus.OK, "successfully logged out", "successfully logged out");
 
 
+	}
+
+	@Override
+	public ResponseEntity<ResponseStructure<String>> revokeAll(HttpServletResponse response) {
+		String username = SecurityContextHolder.getContext().getAuthentication().getName();
+		if(username == null) throw new UsernameNotFoundException("username not found");
+		
+		return userRepository.findByUsername(username)
+		.map(user -> {
+			
+			blockAccessToken(accessTokenRepository.findByUserAndAccessTokenIsBlocked(user, false));
+			blockRefreshToken(refreshTokenRepository.findByUserAndRefreshTokenIsBlocked(user, false));
+			
+			response.addCookie(cookieManager.invalidateCookie(new Cookie("at", "")));
+			response.addCookie(cookieManager.invalidateCookie(new Cookie("rt", "")));
+			
+			return ResponseEntityProxy.setResponseStructure(HttpStatus.OK, "revoke done", "revoke done on all device");
+		})
+		.orElseThrow(() -> new UsernameNotFoundException("username not found"));
+	}
+
+	
+
+	@Override
+	public ResponseEntity<ResponseStructure<String>> revokeOthers(String accessToken, String refreshToken) {
+		String username = SecurityContextHolder.getContext().getAuthentication().getName();
+		if(username == null) throw new UsernameNotFoundException("username not found");
+		
+		return userRepository.findByUsername(username)
+		.map(user -> {
+			blockAccessToken(accessTokenRepository.findByUserAndAccessTokenIsBlockedAndAccessTokenNot(user, false, accessToken));
+			blockRefreshToken(refreshTokenRepository.findByUserAndRefreshTokenIsBlockedAndRefreshTokenNot(user, false, refreshToken));
+			
+			return ResponseEntityProxy.setResponseStructure(HttpStatus.OK, "revoked others", "revoked others");
+		})
+		.orElseThrow(() -> new UsernameNotFoundException("username not found"));
 	}
 
 }
