@@ -17,7 +17,7 @@ public class ScheduledJobs {
 	private AccessTokenRepository accessTokenRepository;
 	private RefreshTokenRepository refreshTokenRepository;
 
-	@Scheduled(fixedDelay = 2000L)
+	@Scheduled(cron = "0 0 0 * * *")
 	public void deleteExpiredTokens() {
 
 		accessTokenRepository

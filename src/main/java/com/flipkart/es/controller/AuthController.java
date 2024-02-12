@@ -1,6 +1,7 @@
 package com.flipkart.es.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -42,6 +43,7 @@ public class AuthController {
 		return authService.login(authRequest, httpServletResponse);
 	}
 
+	@PreAuthorize("hasAuthority('CUSTOMER') OR hasAuthority('SELLER')")
 	@PutMapping("/logout")
 	public ResponseEntity<ResponseStructure<String>> logout(@CookieValue(name = "at", required = false) String accessToken,
 			@CookieValue(name = "rt", required = false) String refreshToken, HttpServletResponse response){

@@ -268,6 +268,8 @@ public class AuthServiceImpl implements AuthService {
 		String otp = generateOTP();
 		userCacheStore.add(userRequest.getUserEmail(), user);
 		otpCacheStore.add(userRequest.getUserEmail(), otp);
+		
+		System.out.println("hello");
 
 		try {
 			sendOtpToMail(user, otp);

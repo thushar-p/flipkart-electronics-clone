@@ -5,7 +5,8 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class UserNotLoggedInException extends RuntimeException {/**
+public class UserNotLoggedInException extends RuntimeException {
+	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
