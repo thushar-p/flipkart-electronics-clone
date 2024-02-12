@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.flipkart.es.entity.AccessToken;
-import com.flipkart.es.exception.UserNotLoggedInException;
 import com.flipkart.es.repository.AccessTokenRepository;
 
 import jakarta.servlet.FilterChain;
