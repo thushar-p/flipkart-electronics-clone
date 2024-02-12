@@ -8,6 +8,7 @@ import com.flipkart.es.requestdto.UserRequest;
 import com.flipkart.es.responsedto.AuthResponse;
 import com.flipkart.es.responsedto.UserResponse;
 import com.flipkart.es.util.ResponseStructure;
+import com.flipkart.es.util.SimpleResponseStructure;
 
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -20,10 +21,12 @@ public interface AuthService {
 	ResponseEntity<ResponseStructure<AuthResponse>> login(AuthRequest authRequest,
 			HttpServletResponse httpServletResponse);
 
-	ResponseEntity<ResponseStructure<String>> logout(String accessToken, String refreshToken, HttpServletResponse response);
+	ResponseEntity<SimpleResponseStructure> logout(String accessToken, String refreshToken, HttpServletResponse response);
 
-	ResponseEntity<ResponseStructure<String>> revokeAll(HttpServletResponse response);
+	 ResponseEntity<SimpleResponseStructure> revokeAll(HttpServletResponse response);
 
-	ResponseEntity<ResponseStructure<String>> revokeOthers(String accessToken, String refreshToken);
+	 ResponseEntity<SimpleResponseStructure> revokeOthers(String accessToken, String refreshToken);
+
+	ResponseEntity<SimpleResponseStructure> refreshLogin(String accessToken, String refreshToken, HttpServletResponse response);
 
 }

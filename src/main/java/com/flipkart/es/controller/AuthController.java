@@ -16,6 +16,7 @@ import com.flipkart.es.responsedto.AuthResponse;
 import com.flipkart.es.responsedto.UserResponse;
 import com.flipkart.es.service.AuthService;
 import com.flipkart.es.util.ResponseStructure;
+import com.flipkart.es.util.SimpleResponseStructure;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
@@ -45,22 +46,28 @@ public class AuthController {
 
 	@PreAuthorize("hasAuthority('CUSTOMER') OR hasAuthority('SELLER')")
 	@PutMapping("/logout")
-	public ResponseEntity<ResponseStructure<String>> logout(@CookieValue(name = "at", required = false) String accessToken,
+	public ResponseEntity<SimpleResponseStructure> logout(@CookieValue(name = "at", required = false) String accessToken,
 			@CookieValue(name = "rt", required = false) String refreshToken, HttpServletResponse response){
 		return authService.logout(accessToken, refreshToken, response);
 	}
 	
 	@PreAuthorize("hasAuthority('CUSTOMER') OR hasAuthority('SELLER')")
 	@PutMapping("/revoke-all")
-	public ResponseEntity<ResponseStructure<String>> revokeAll(HttpServletResponse response){
+	public  ResponseEntity<SimpleResponseStructure> revokeAll(HttpServletResponse response){
 		return authService.revokeAll(response);
 	}
 	
 	@PreAuthorize("hasAuthority('CUSTOMER') OR hasAuthority('SELLER')")
 	@PutMapping("/revoke-others")
-	public ResponseEntity<ResponseStructure<String>> revokeOthers(@CookieValue(name = "at", required = false) String accessToken,
+	public  ResponseEntity<SimpleResponseStructure> revokeOthers(@CookieValue(name = "at", required = false) String accessToken,
 			@CookieValue(name = "rt", required = false) String refreshToken){
 		return authService.revokeOthers(accessToken, refreshToken);
+	}
+	
+	@PutMapping("/refresh-login")
+	public  ResponseEntity<SimpleResponseStructure> refreshLogin(@CookieValue(name = "at", required = false) String accessToken,
+			@CookieValue(name = "rt", required = false) String refreshToken, HttpServletResponse response){
+		return authService.refreshLogin(accessToken, refreshToken, response);
 	}
 	
 }
