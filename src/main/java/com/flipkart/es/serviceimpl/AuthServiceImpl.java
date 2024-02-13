@@ -31,6 +31,8 @@ import com.flipkart.es.exception.InvalidOTPException;
 import com.flipkart.es.exception.InvalidUserRoleException;
 import com.flipkart.es.exception.OTPExpiredException;
 import com.flipkart.es.exception.RegistrationSessionExpiredException;
+import com.flipkart.es.exception.UserLoggedInException;
+import com.flipkart.es.exception.UserNotFoundException;
 import com.flipkart.es.exception.UserNotLoggedInException;
 import com.flipkart.es.exception.UserRegisteredException;
 import com.flipkart.es.repository.AccessTokenRepository;
@@ -289,8 +291,6 @@ public class AuthServiceImpl implements AuthService {
 		userCacheStore.add(userRequest.getUserEmail(), user);
 		otpCacheStore.add(userRequest.getUserEmail(), otp);
 		
-		System.out.println("hello");
-
 		try {
 			sendOtpToMail(user, otp);
 		} catch (MessagingException e) {
@@ -330,8 +330,10 @@ public class AuthServiceImpl implements AuthService {
 	}
 
 	@Override
-	public ResponseEntity<ResponseStructure<AuthResponse>> login(AuthRequest authRequest,
+	public ResponseEntity<ResponseStructure<AuthResponse>> login(String accessToken, String refreshToken, AuthRequest authRequest,
 			HttpServletResponse httpServletResponse) {
+		
+		if(accessToken != null && refreshToken != null) throw new UserLoggedInException("user already logged In");
 		
 		String username = authRequest.getUserEmail().split("@")[0];
 
@@ -441,7 +443,8 @@ public class AuthServiceImpl implements AuthService {
 				rt.setRefreshTokenIsBlocked(true);
 				return refreshTokenRepository.save(rt);
 				
-			});
+			})
+			.orElseThrow(() -> new UserNotFoundException("user not found"));
 			
 			return ResponseEntityProxy.setSimpleResponseStructure(HttpStatus.OK, "token successfuly generated");
 		})
