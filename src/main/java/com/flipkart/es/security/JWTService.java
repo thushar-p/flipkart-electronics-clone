@@ -40,14 +40,12 @@ public class JWTService {
 	}
 
 	private String generateJWT(Map<String, Object> claims, String username, Long expiry) {
-		String compact = Jwts.builder()
+		return Jwts.builder()
 				.setClaims(claims).setSubject(username)
 				.setIssuedAt(new Date(System.currentTimeMillis()))
 				.setExpiration(new Date(System.currentTimeMillis() + expiry))
 				.signWith(getSignature(), SignatureAlgorithm.HS512)
 				.compact();
-		System.out.println(compact);
-		return compact;
 	}
 
 	private Key getSignature() {

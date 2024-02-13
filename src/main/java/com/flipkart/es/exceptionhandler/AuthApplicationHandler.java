@@ -12,6 +12,8 @@ import com.flipkart.es.exception.InvalidOTPException;
 import com.flipkart.es.exception.InvalidUserRoleException;
 import com.flipkart.es.exception.OTPExpiredException;
 import com.flipkart.es.exception.RegistrationSessionExpiredException;
+import com.flipkart.es.exception.UserLoggedInException;
+import com.flipkart.es.exception.UserNotFoundException;
 import com.flipkart.es.exception.UserNotLoggedInException;
 import com.flipkart.es.exception.UserRegisteredException;
 
@@ -55,6 +57,16 @@ public class AuthApplicationHandler {
     @ExceptionHandler(UserNotLoggedInException.class)
     public ResponseEntity<Object> handleUserNotLoggedInException(UserNotLoggedInException exception){
         return structure(HttpStatus.BAD_REQUEST, exception.getMessage(), "user not logged in");
+    }
+    
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<Object> handleUserNotFoundException(UserNotFoundException exception){
+        return structure(HttpStatus.NOT_FOUND, exception.getMessage(), "user not found");
+    }
+    
+    @ExceptionHandler(UserLoggedInException.class)
+    public ResponseEntity<Object> handleUserLoggedInException(UserLoggedInException exception){
+        return structure(HttpStatus.BAD_REQUEST, exception.getMessage(), "user already logged in");
     }
     
 }

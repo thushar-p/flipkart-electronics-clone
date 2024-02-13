@@ -18,7 +18,7 @@ public interface AuthService {
 
 	ResponseEntity<ResponseStructure<UserResponse>> verifyOtp(OtpModel otpModel);
 
-	ResponseEntity<ResponseStructure<AuthResponse>> login(AuthRequest authRequest,
+	ResponseEntity<ResponseStructure<AuthResponse>> login(String accessToken, String refreshToken, AuthRequest authRequest,
 			HttpServletResponse httpServletResponse);
 
 	ResponseEntity<SimpleResponseStructure> logout(String accessToken, String refreshToken, HttpServletResponse response);

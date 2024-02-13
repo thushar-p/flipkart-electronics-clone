@@ -25,50 +25,55 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 @RequestMapping("/api/v1")
 public class AuthController {
-	
+
 	private AuthService authService;
-	
+
 	@PostMapping("/users/register")
 	public ResponseEntity<ResponseStructure<UserResponse>> registerUser(@RequestBody UserRequest userRequest) {
 		return authService.registerUser(userRequest);
 	}
-	
+
 	@PostMapping("/verify-otp")
-	public ResponseEntity<ResponseStructure<UserResponse>> verifyOtp(@RequestBody OtpModel otpModel){
+	public ResponseEntity<ResponseStructure<UserResponse>> verifyOtp(@RequestBody OtpModel otpModel) {
 		return authService.verifyOtp(otpModel);
 	}
-	
+
 	@PostMapping("/login")
-	public ResponseEntity<ResponseStructure<AuthResponse>> login(@RequestBody AuthRequest authRequest, 
-	HttpServletResponse httpServletResponse){
-		return authService.login(authRequest, httpServletResponse);
+	public ResponseEntity<ResponseStructure<AuthResponse>> login(
+			@CookieValue(name = "at", required = false) String accessToken,
+			@CookieValue(name = "rt", required = false) String refreshToken, @RequestBody AuthRequest authRequest,
+			HttpServletResponse httpServletResponse) {
+		return authService.login(accessToken, refreshToken, authRequest, httpServletResponse);
 	}
 
 	@PreAuthorize("hasAuthority('CUSTOMER') OR hasAuthority('SELLER')")
 	@PutMapping("/logout")
-	public ResponseEntity<SimpleResponseStructure> logout(@CookieValue(name = "at", required = false) String accessToken,
-			@CookieValue(name = "rt", required = false) String refreshToken, HttpServletResponse response){
+	public ResponseEntity<SimpleResponseStructure> logout(
+			@CookieValue(name = "at", required = false) String accessToken,
+			@CookieValue(name = "rt", required = false) String refreshToken, HttpServletResponse response) {
 		return authService.logout(accessToken, refreshToken, response);
 	}
-	
+
 	@PreAuthorize("hasAuthority('CUSTOMER') OR hasAuthority('SELLER')")
 	@PutMapping("/revoke-all")
-	public  ResponseEntity<SimpleResponseStructure> revokeAll(HttpServletResponse response){
+	public ResponseEntity<SimpleResponseStructure> revokeAll(HttpServletResponse response) {
 		return authService.revokeAll(response);
 	}
-	
+
 	@PreAuthorize("hasAuthority('CUSTOMER') OR hasAuthority('SELLER')")
 	@PutMapping("/revoke-others")
-	public  ResponseEntity<SimpleResponseStructure> revokeOthers(@CookieValue(name = "at", required = false) String accessToken,
-			@CookieValue(name = "rt", required = false) String refreshToken){
+	public ResponseEntity<SimpleResponseStructure> revokeOthers(
+			@CookieValue(name = "at", required = false) String accessToken,
+			@CookieValue(name = "rt", required = false) String refreshToken) {
 		return authService.revokeOthers(accessToken, refreshToken);
 	}
-	
+
 //	@PreAuthorize("hasAuthority('CUSTOMER') OR hasAuthority('SELLER')")
 	@PutMapping("/refresh")
-	public  ResponseEntity<SimpleResponseStructure> refreshLogin(@CookieValue(name = "at", required = false) String accessToken,
-			@CookieValue(name = "rt", required = false) String refreshToken, HttpServletResponse response){
+	public ResponseEntity<SimpleResponseStructure> refreshLogin(
+			@CookieValue(name = "at", required = false) String accessToken,
+			@CookieValue(name = "rt", required = false) String refreshToken, HttpServletResponse response) {
 		return authService.refreshLogin(accessToken, refreshToken, response);
 	}
-	
+
 }
