@@ -383,7 +383,7 @@ public class AuthServiceImpl implements AuthService {
 	@Override
 	public  ResponseEntity<SimpleResponseStructure> revokeAll(HttpServletResponse response) {
 		String username = SecurityContextHolder.getContext().getAuthentication().getName();
-		if(username == null) throw new UsernameNotFoundException("username not found");
+		if(username.equals("anonymousUser")) throw new UsernameNotFoundException("username not found");
 		
 		return userRepository.findByUsername(username)
 		.map(user -> {
@@ -417,25 +417,31 @@ public class AuthServiceImpl implements AuthService {
 	}
 
 	@Override
-	public ResponseEntity<SimpleResponseStructure> refreshLogin(String accessToken, String refreshToken, HttpServletResponse response) {
+	public ResponseEntity<SimpleResponseStructure> refreshLogin(String accessToken, String refreshToken, HttpServletResponse response) {	
 		
 		if(accessToken != null) {
 			accessTokenRepository.findByAccessToken(accessToken)
 			.map(at -> {
 				at.setAccessTokenIsBlocked(true);
 				return accessTokenRepository.save(at);
-			})
-			.orElseThrow(() -> new RuntimeException("access token not found"));
+			});
 		}
 		
 		if(refreshToken == null) throw new UserNotLoggedInException("user logged out");
 		
-		String username = jwtService.extractUsername(refreshToken);
-		if(username == null) throw new UsernameNotFoundException("user name not found");
+		String username = SecurityContextHolder.getContext().getAuthentication().getName();
+		if(username.equals("anonymousUser")) throw new UsernameNotFoundException("username not found");
 		
 		return userRepository.findByUsername(username)
 		.map(user -> {
 			grantAccess(response, user);
+			
+			refreshTokenRepository.findByRefreshToken(refreshToken)
+			.map(rt -> {
+				rt.setRefreshTokenIsBlocked(true);
+				return refreshTokenRepository.save(rt);
+				
+			});
 			
 			return ResponseEntityProxy.setSimpleResponseStructure(HttpStatus.OK, "token successfuly generated");
 		})

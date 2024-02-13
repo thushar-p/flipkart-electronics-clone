@@ -64,7 +64,8 @@ public class AuthController {
 		return authService.revokeOthers(accessToken, refreshToken);
 	}
 	
-	@PutMapping("/refresh-login")
+//	@PreAuthorize("hasAuthority('CUSTOMER') OR hasAuthority('SELLER')")
+	@PutMapping("/refresh")
 	public  ResponseEntity<SimpleResponseStructure> refreshLogin(@CookieValue(name = "at", required = false) String accessToken,
 			@CookieValue(name = "rt", required = false) String refreshToken, HttpServletResponse response){
 		return authService.refreshLogin(accessToken, refreshToken, response);
