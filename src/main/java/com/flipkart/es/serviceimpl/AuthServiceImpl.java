@@ -49,6 +49,7 @@ import com.flipkart.es.util.CookieManager;
 import com.flipkart.es.util.MessageStructure;
 import com.flipkart.es.util.ResponseEntityProxy;
 import com.flipkart.es.util.ResponseStructure;
+import com.flipkart.es.util.SimpleResponseStructure;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -331,6 +332,7 @@ public class AuthServiceImpl implements AuthService {
 	@Override
 	public ResponseEntity<ResponseStructure<AuthResponse>> login(AuthRequest authRequest,
 			HttpServletResponse httpServletResponse) {
+		
 		String username = authRequest.getUserEmail().split("@")[0];
 
 		UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(username,
@@ -355,7 +357,7 @@ public class AuthServiceImpl implements AuthService {
 	}
 
 	@Override
-	public ResponseEntity<ResponseStructure<String>> logout(String accessToken, String refreshToken, HttpServletResponse response) {
+	public  ResponseEntity<SimpleResponseStructure> logout(String accessToken, String refreshToken, HttpServletResponse response) {
 		
 		if(accessToken == null && refreshToken == null) throw new UserNotLoggedInException("user not logged in");
 
@@ -374,15 +376,14 @@ public class AuthServiceImpl implements AuthService {
 		response.addCookie(cookieManager.invalidateCookie(new Cookie("at", "")));
 		response.addCookie(cookieManager.invalidateCookie(new Cookie("rt", "")));
 		
-		return ResponseEntityProxy.setResponseStructure(HttpStatus.OK, "successfully logged out", "successfully logged out");
-
+		return ResponseEntityProxy.setSimpleResponseStructure(HttpStatus.OK, "logged out successfully");
 
 	}
 
 	@Override
-	public ResponseEntity<ResponseStructure<String>> revokeAll(HttpServletResponse response) {
+	public  ResponseEntity<SimpleResponseStructure> revokeAll(HttpServletResponse response) {
 		String username = SecurityContextHolder.getContext().getAuthentication().getName();
-		if(username == null) throw new UsernameNotFoundException("username not found");
+		if(username.equals("anonymousUser")) throw new UsernameNotFoundException("username not found");
 		
 		return userRepository.findByUsername(username)
 		.map(user -> {
@@ -393,7 +394,7 @@ public class AuthServiceImpl implements AuthService {
 			response.addCookie(cookieManager.invalidateCookie(new Cookie("at", "")));
 			response.addCookie(cookieManager.invalidateCookie(new Cookie("rt", "")));
 			
-			return ResponseEntityProxy.setResponseStructure(HttpStatus.OK, "revoke done", "revoke done on all device");
+			return ResponseEntityProxy.setSimpleResponseStructure(HttpStatus.OK, "revoked all devices");
 		})
 		.orElseThrow(() -> new UsernameNotFoundException("username not found"));
 	}
@@ -401,7 +402,7 @@ public class AuthServiceImpl implements AuthService {
 	
 
 	@Override
-	public ResponseEntity<ResponseStructure<String>> revokeOthers(String accessToken, String refreshToken) {
+	public  ResponseEntity<SimpleResponseStructure> revokeOthers(String accessToken, String refreshToken) {
 		String username = SecurityContextHolder.getContext().getAuthentication().getName();
 		if(username == null) throw new UsernameNotFoundException("username not found");
 		
@@ -410,9 +411,43 @@ public class AuthServiceImpl implements AuthService {
 			blockAccessToken(accessTokenRepository.findByUserAndAccessTokenIsBlockedAndAccessTokenNot(user, false, accessToken));
 			blockRefreshToken(refreshTokenRepository.findByUserAndRefreshTokenIsBlockedAndRefreshTokenNot(user, false, refreshToken));
 			
-			return ResponseEntityProxy.setResponseStructure(HttpStatus.OK, "revoked others", "revoked others");
+			return ResponseEntityProxy.setSimpleResponseStructure(HttpStatus.OK, "revoked all other devices");
 		})
 		.orElseThrow(() -> new UsernameNotFoundException("username not found"));
 	}
 
+	@Override
+	public ResponseEntity<SimpleResponseStructure> refreshLogin(String accessToken, String refreshToken, HttpServletResponse response) {	
+		
+		if(accessToken != null) {
+			accessTokenRepository.findByAccessToken(accessToken)
+			.map(at -> {
+				at.setAccessTokenIsBlocked(true);
+				return accessTokenRepository.save(at);
+			});
+		}
+		
+		if(refreshToken == null) throw new UserNotLoggedInException("user logged out");
+		
+		String username = SecurityContextHolder.getContext().getAuthentication().getName();
+		if(username.equals("anonymousUser")) throw new UsernameNotFoundException("username not found");
+		
+		return userRepository.findByUsername(username)
+		.map(user -> {
+			grantAccess(response, user);
+			
+			refreshTokenRepository.findByRefreshToken(refreshToken)
+			.map(rt -> {
+				rt.setRefreshTokenIsBlocked(true);
+				return refreshTokenRepository.save(rt);
+				
+			});
+			
+			return ResponseEntityProxy.setSimpleResponseStructure(HttpStatus.OK, "token successfuly generated");
+		})
+		.orElseThrow(() -> new UsernameNotFoundException("user name not found"));
+		
+	}
+
+	
 }
