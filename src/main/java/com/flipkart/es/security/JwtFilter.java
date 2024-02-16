@@ -37,28 +37,34 @@ public class JwtFilter extends OncePerRequestFilter {
 		String rt = "";
 		String username = null;
 		Cookie[] cookies = request.getCookies();
-		
-		if(cookies != null) {
+		log.info("inside JWTFilter");
 
-			for(Cookie cookie : cookies) {
-				if(cookie.getName().equals("at")) at = cookie.getValue();
-				if(cookie.getName().equals("rt")) rt = cookie.getValue();
+		if (cookies != null) {
+
+			for (Cookie cookie : cookies) {
+				if (cookie.getName().equals("at"))
+					at = cookie.getValue();
+				if (cookie.getName().equals("rt"))
+					rt = cookie.getValue();
 			}
-
-			if(at != null && rt != null) {
-				Optional<AccessToken> accessToken = accessTokenRepository.findByAccessTokenAndAccessTokenIsBlocked(at, false);
-
-				if(accessToken == null) throw new RuntimeException("dosen't exist");
+			log.info("inside if");
+			if (at != null && rt != null) {
+				Optional<AccessToken> accessToken = accessTokenRepository.findByAccessTokenAndAccessTokenIsBlocked(at,
+						false);
+				log.info("inside second info");
+				if (accessToken == null)
+					throw new RuntimeException("dosen't exist");
 				else {
 					log.info("Authenticating the token...");
 					username = jwtService.extractUsername(at);
 					log.info(username);
 
-					if(username == null) throw new RuntimeException("failed to authenticate");
+					if (username == null)
+						throw new RuntimeException("failed to authenticate");
 
 					UserDetails userDetails = customUserDetailService.loadUserByUsername(username);
-					UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = 
-							new UsernamePasswordAuthenticationToken(username, null, userDetails.getAuthorities());
+					UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
+							username, null, userDetails.getAuthorities());
 
 					usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetails(request));
 					SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);

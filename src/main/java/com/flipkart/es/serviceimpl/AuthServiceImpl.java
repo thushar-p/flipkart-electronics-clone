@@ -196,7 +196,7 @@ public class AuthServiceImpl implements AuthService {
 	private void sendOtpToMail(User user, String otp) throws MessagingException {
 		sendMail(MessageStructure.builder()
 				.to(user.getUserEmail())
-				.subject("complete your registration to flipkart electronics")
+				.subject("Complete your registration to flipkart electronics")
 				.sentDate(new Date())
 				.text(
 						"<p>Hello " + user.getUsername() + "</p><br>"
@@ -292,7 +292,9 @@ public class AuthServiceImpl implements AuthService {
 		otpCacheStore.add(userRequest.getUserEmail(), otp);
 		
 		try {
+			log.info("Sending mail");
 			sendOtpToMail(user, otp);
+			log.info("Email sent");
 		} catch (MessagingException e) {
 			log.error("the email address dosen't exist");
 		}
